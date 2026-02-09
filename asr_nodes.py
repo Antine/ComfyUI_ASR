@@ -141,6 +141,15 @@ def create_custom_sentences(words_list, sentences_list, max_len, lang="zh"):
 
     return custom_sentences_list
 
+def generate_srt(custom_sentences_list):
+    srt_content = ""
+    for i, sentence in enumerate(custom_sentences_list, start=1):
+        start_time, end_time, text = sentence
+        start_time_str = f"{int(start_time // 3600):02}:{int((start_time % 3600) // 60):02}:{int(start_time % 60):02},{int((start_time % 1) * 1000):03}"
+        end_time_str = f"{int(end_time // 3600):02}:{int((end_time % 3600) // 60):02}:{int(end_time % 60):02},{int((end_time % 1) * 1000):03}"
+        srt_content += f"{i}\n{start_time_str} --> {end_time_str}\n{text.strip()}\n\n"
+    return srt_content
+
 MODEL_CACHE = None
 class ASRMW:
     models_list = ["k1nto/Belle-whisper-large-v3-zh-punct-ct2", "CWTchen/Belle-whisper-large-v3-zh-punct-ct2-float32", "erik-svensson-cm/whisper-large-v3-ct2"]
@@ -161,8 +170,8 @@ class ASRMW:
             "optional": {},
         }
 
-    RETURN_TYPES = ("STRING", "STRING", "STRING",)
-    RETURN_NAMES = ("纯文本", "时间戳单词", "时间戳句子",)
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING")
+    RETURN_NAMES = ("纯文本", "时间戳单词", "时间戳句子","SRT字幕")
     FUNCTION = "run_inference"
     CATEGORY = "🎤MW/MW-ASR"
 
@@ -224,7 +233,7 @@ class ASRMW:
             MODEL_CACHE = None
             torch.cuda.empty_cache()
 
-        return (纯文本, convert_to_string(words_list), convert_to_string(custom_sentences_list))
+        return (纯文本, convert_to_string(words_list), convert_to_string(custom_sentences_list), generate_srt(custom_sentences_list))
 
 
 

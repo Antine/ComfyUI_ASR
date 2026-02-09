@@ -49,7 +49,7 @@ def download_model_with_snapshot(
     if not os.path.exists(local_dir):
         os.makedirs(local_dir)
     else:
-        print(f"模型文件夹{local_dir}已存在。")
+        print(f"模型文件夹 {local_dir} 已存在。")
         return local_dir
 
     download_params = {
